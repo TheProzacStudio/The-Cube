@@ -1065,7 +1065,7 @@ MonoBehaviour:
   slideDistance: -2
   joltFraction: 0.02
   joltTime: 0.15
-  pauseTime: 1
+  pauseTime: 0.6
   slowTime: 4
   lightHeight: 2.5
   readyColor: {r: 0, g: 1, b: 0, a: 1}
@@ -1661,11 +1661,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SlidingDoor
   leftWing: {fileID: 1456155056}
   rightWing: {fileID: 910371954}
-  slideDistance: 1.5
-  joltFraction: 0.15
-  joltTime: 0.12
+  slideDistance: -2
+  joltFraction: 0.02
+  joltTime: 0.15
   pauseTime: 0.6
-  slowTime: 2
+  slowTime: 5
   lightHeight: 2.5
   readyColor: {r: 0, g: 1, b: 0, a: 1}
 --- !u!1001 &1558407118
