@@ -26,6 +26,13 @@ public class DoorInteractor : MonoBehaviour
             {
                 door.SetReady();
                 door.Open();
+                return;
+            }
+
+            ThresholdHatch hatch = hit.collider.GetComponentInParent<ThresholdHatch>();
+            if (hatch != null)
+            {
+                hatch.Open();
             }
         }
     }

@@ -92,6 +92,7 @@ public class Cube
     {
         public int level, x, y, type;
         public float difficulty;
+        public int difficultyCategory;   // rzutowany ROOM_DIFFICULTY
     }
 
     public List<RoomInfo> getRooms()
@@ -110,18 +111,23 @@ public class Cube
      *  Room type bit mask, allows one room to have multiple types at the same time
      */
 
-    private const int ROOM              = 0b00000001;
-    private const int START             = 0b00000010;
-    private const int THRESHOLD         = 0b00000100;
-    private const int THRESHOLD_DROP    = 0b00001000;
-    private const int END               = 0b00010000;
+    private const int ROOM              = 0b0000_0000_0000_0001;
+    private const int START             = 0b0000_0000_0000_0010;
+    private const int THRESHOLD         = 0b0000_0000_0000_0100;
+    private const int THRESHOLD_DROP    = 0b0000_0000_0000_1000;
+    private const int END               = 0b0000_0000_0001_0000;
 
-/*
- *  Room difficulties:
- *  Easy, Medium, Hard  - i think the names describe the difficulty perfectly
- *  Diabolical          - straight up torture, no way to get out unless you lose something
- *  Chaos               - can be good, or can be bad. An example of Chaos chamber is The Prozac Trial
- */
+    private const int DISCOVERED        = 0b0000_0000_0010_0000;
+    private const int CHOSEN            = 0b0000_0000_0100_0000;
+    private const int COMPLETE          = 0b0000_0000_1000_0000;
+    private const int ACTIVE            = 0b0000_0001_0000_0000;
+
+    /*
+     *  Room difficulties:
+     *  Easy, Medium, Hard  - i think the names describe the difficulty perfectly
+     *  Diabolical          - straight up torture, no way to get out unless you lose something
+     *  Chaos               - can be good, or can be bad. An example of Chaos chamber is The Prozac Trial
+     */
     private enum ROOM_DIFFICULTY
     {
         EASY = 0, MEDIUM, HARD, DIABOLICAL, CHAOS, NOT_APPLYABLE,
@@ -153,6 +159,7 @@ public class Cube
 
         public int getType() { return type; }
         public float getDifficulty() { return difficulty; }
+        public ROOM_DIFFICULTY getRoomDifficulty() { return roomDifficulty; }
 
         public void setPosX(int x)
         {
@@ -295,7 +302,8 @@ public class Cube
                     x = c.getPosX(),
                     y = c.getPosY(),
                     type = c.getType(),
-                    difficulty = c.getDifficulty()
+                    difficulty = c.getDifficulty(),
+                    difficultyCategory = (int)c.getRoomDifficulty()
                 });
         }
 
@@ -313,17 +321,9 @@ public class Cube
             {
                 random = UnityEngine.Random.Range(0, numberOfRooms);
 
-                foreach (int i in neighbours) 
-                {
-                    if (random == i)
-                    {
-                        sorted = false;
-                        break;
-                    }
-                    else sorted = true;
-                }
-
-                if (random == thresholdDrop) sorted = false;
+                if (neighbours.Contains(random)) sorted = false;
+                else if (random == thresholdDrop) sorted = false;
+                else sorted = true;
             }
 
             this.thresholdIndex = random;

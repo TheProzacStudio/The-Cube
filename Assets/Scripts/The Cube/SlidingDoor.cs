@@ -14,14 +14,42 @@ public class SlidingDoor : MonoBehaviour
     [SerializeField] private float pauseTime = 0.6f;       // the little stop
     [SerializeField] private float slowTime = 2.0f;        // slow full open
 
-    [Header("Ready light")]
-    [SerializeField] private float lightHeight = 2.5f;     // above the door
-    [SerializeField] private Color readyColor = Color.green;
+    [Header("Lamps (po jednej z każdej strony)")]
+    [SerializeField] private DoorLamp lampSideA;   // patrzy w stronę pokoju A
+    [SerializeField] private DoorLamp lampSideB;   // patrzy w stronę pokoju B
 
     private Vector3 leftClosed, rightClosed;
     private Light readyLight;
     private bool isReady = false;
     private bool isOpen = false;
+
+    // które dwa pokoje rozdzielają te drzwi (zapisywane przy spawnie)
+    private (int, int, int) roomA;   // pokój po jednej stronie
+    private (int, int, int) roomB;   // pokój po drugiej stronie
+
+    public void SetNeighbours((int, int, int) a, (int, int, int) b)
+    {
+        roomA = a;
+        roomB = b;
+    }
+
+    public void RefreshLamps(LampManager manager)
+    {
+        bool aDone = manager.IsComplete(roomA);
+        bool bDone = manager.IsComplete(roomB);
+
+        // ZAMIENIONE: lampSideA świeci gdy roomB ukończony (bo fizycznie wisi po stronie B)
+        if (lampSideA != null)
+        {
+            if (bDone && !aDone) lampSideA.TurnOn();
+            else lampSideA.TurnOff();
+        }
+        if (lampSideB != null)
+        {
+            if (aDone && !bDone) lampSideB.TurnOn();
+            else lampSideB.TurnOff();
+        }
+    }
 
     void Awake()
     {
@@ -29,22 +57,16 @@ public class SlidingDoor : MonoBehaviour
         leftClosed = leftWing.localPosition;
         rightClosed = rightWing.localPosition;
 
-        // spawn the light above the door, off for now
-        GameObject lightObj = new GameObject("ReadyLight");
-        lightObj.transform.SetParent(transform, false);
-        lightObj.transform.localPosition = new Vector3(0, lightHeight, 0);
-        readyLight = lightObj.AddComponent<Light>();
-        readyLight.type = LightType.Point;
-        readyLight.color = readyColor;
-        readyLight.range = 6f;
-        readyLight.intensity = 0f;   // off until ready
+        if (lampSideA != null) lampSideA.TurnOff();
+        if (lampSideB != null) lampSideB.TurnOff();
     }
 
     // Phase 1: task done — light on, door armed
     public void SetReady()
     {
         isReady = true;
-        readyLight.intensity = 3f;
+        //if (lampSideA != null) lampSideA.TurnOn();
+        //if (lampSideB != null) lampSideB.TurnOn();
     }
 
     // Phase 2: player chose this door
@@ -86,5 +108,12 @@ public class SlidingDoor : MonoBehaviour
         }
         leftWing.localPosition = lTo;
         rightWing.localPosition = rTo;
+    }
+
+    // wołane przez renderer: colorA = kolor pokoju po stronie A, colorB = po stronie B
+    public void SetLampColors(Color colorA, Color colorB)
+    {
+        if (lampSideA != null) lampSideA.SetColor(colorA);
+        if (lampSideB != null) lampSideB.SetColor(colorB);
     }
 }
