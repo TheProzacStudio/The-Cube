@@ -10,19 +10,25 @@ public class PlayerCam : MonoBehaviour
 
     float xRotation;
     float yRotation;
+    private float sensitivityMultiplier = 1f;   // z ustawień
 
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        // wczytaj czułość zapisaną w menu (domyślnie 1)
+        sensitivityMultiplier = PlayerPrefs.GetFloat("sensitivity", 1f);
     }
 
     void Update()
     {
+        if (Mouse.current == null) return;
+
         Vector2 mouseDelta = Mouse.current.delta.ReadValue();
 
-        float mouseX = mouseDelta.x * Time.deltaTime * sensX;
-        float mouseY = mouseDelta.y * Time.deltaTime * sensX;
+        float mouseX = mouseDelta.x * sensX * 0.01f * sensitivityMultiplier;
+        float mouseY = mouseDelta.y * sensY * 0.01f * sensitivityMultiplier;
 
         yRotation += mouseX;
         xRotation -= mouseY;

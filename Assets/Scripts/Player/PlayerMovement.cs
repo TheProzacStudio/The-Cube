@@ -33,6 +33,17 @@ public class PlayerMovement : MonoBehaviour
 
     Rigidbody rb;
 
+    // --- udostępnione dla Footsteps (i innych skryptów) ---
+    public bool IsGrounded => grounded;
+    public float HorizontalSpeed
+    {
+        get
+        {
+            if (rb == null) return 0f;
+            Vector3 flat = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+            return flat.magnitude;
+        }
+    }
 
     void Start()
     {
@@ -85,7 +96,7 @@ public class PlayerMovement : MonoBehaviour
     private void MovePlayer()
     {
         moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
-        
+
         if (grounded)
             rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
 
@@ -95,7 +106,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void SpeedControl()
     {
-        Vector3 flatVel = new Vector3(rb.linearVelocity.x, 0f,rb.linearVelocity.z);
+        Vector3 flatVel = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
 
         if (flatVel.magnitude > moveSpeed)
         {
